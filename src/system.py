@@ -12,14 +12,15 @@ class SystemValues(object):
             "LAST"  :9
         }
         self.SERVICES = {
-            "VERIFICATION": {"port": 1},
-            "HK": {"port": 3,
-                    "subservice": {
-                        "HK_PARAMETERS_REPORT": 25
+            "VERIFICATION":         {"port": 8},
+            "HK": {
+                "port": 9,
+                "subservice": {
+                    "HK_PARAMETERS_REPORT": 25
                     }
-            },
-            "EVENT": {"port": 5},
-            "FUNCTION_MANAGEMENT": {"port": 8},
+                },
+            "EVENT":                {"port": 5},
+            "FUNCTION_MANAGEMENT":  {"port": 8},
             "TIME_MANAGEMENT": {
                 "port": 9,
                 "subservice": {
