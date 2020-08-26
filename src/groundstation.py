@@ -109,8 +109,9 @@ class Csp(object):
         libcsp.sendto(0, server, port, 1, libcsp.CSP_O_NONE, buf, 1000)
         libcsp.buffer_free(buf)
 
-    def receive(self):
+    def receive(self, sock, flag):
         libcsp.listen(sock, 5)
+        attempts = 0
         while True:
             # Exit the loop gracefully (ie. CTRL+C)
             if flag.exit():
@@ -120,8 +121,11 @@ class Csp(object):
 
             # wait for incoming connection
             print("Waiting for a reply ... (CTRL+C to stop)")
-            conn = libcsp.accept(sock, 1000) # or libcsp.CSP_MAX_TIMEOUT
+            conn = libcsp.accept(sock, 500) # or libcsp.CSP_MAX_TIMEOUT
+            if attempts > 15:
+                return
             if not conn:
+                attempts+=1
                 continue
 
             print ("connection: source=%i:%i, dest=%i:%i" % (libcsp.conn_src(conn),
@@ -173,7 +177,6 @@ if __name__ == "__main__":
     opts = getOptions()
     csp = Csp(opts)
     flag = GracefulExiter()
-
     sock = libcsp.socket()
     libcsp.bind(sock, libcsp.CSP_ANY)
 
@@ -181,6 +184,6 @@ if __name__ == "__main__":
         try:
             toSend, server, port = csp.getInput(prompt="to send: ")
             csp.send(server, port, toSend);
-            csp.receive()
+            csp.receive(sock, flag)
         except Exception as e:
             print(e)
