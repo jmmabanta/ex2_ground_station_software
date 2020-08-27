@@ -132,12 +132,13 @@ class Csp(object):
                                                              libcsp.conn_sport(conn),
                                                              libcsp.conn_dst(conn),
                                                              libcsp.conn_dport(conn)))
+            received = []
             while True:
                 # Read all packets on the connection
                 packet = libcsp.read(conn, 100)
                 if packet is None:
                     print("No more packets (packet is None)\n")
-                    return # return to getting input
+                    return received # return to getting input
                 # print the packet's data
                 data = bytearray(libcsp.packet_get_data(packet))
                 length = libcsp.packet_get_length(packet)
@@ -145,6 +146,7 @@ class Csp(object):
                 data_hex = data.hex()
                 print("\thex:", data_hex[0:2], data_hex[2:])
                 print("\thex payload converted to int:", int(data_hex[2:], 16))
+                received.append(int(data_hex[2:], 16))
 
 
 class GracefulExiter():
