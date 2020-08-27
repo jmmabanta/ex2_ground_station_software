@@ -109,18 +109,12 @@ class Csp(object):
         libcsp.sendto(0, server, port, 1, libcsp.CSP_O_NONE, buf, 1000)
         libcsp.buffer_free(buf)
 
-    def receive(self, sock, flag):
+    def receive(self, sock):
         libcsp.listen(sock, 5)
         attempts = 0
         while True:
-            # Exit the loop gracefully (ie. CTRL+C)
-            if flag.exit():
-                print("Exiting receiving loop")
-                flag.reset()
-                return
-
             # wait for incoming connection
-            print("Waiting for a reply ... (CTRL+C to stop)")
+            print("Listening for a reply ...")
             conn = libcsp.accept(sock, 500) # or libcsp.CSP_MAX_TIMEOUT
             if attempts > 15:
                 return
@@ -139,7 +133,7 @@ class Csp(object):
                 if packet is None:
                     print("No more packets (packet is None)\n")
                     return received # return to getting input
-                # print the packet's data
+                # get the packet's data
                 data = bytearray(libcsp.packet_get_data(packet))
                 length = libcsp.packet_get_length(packet)
                 print ("got packet, len=" + str(length) + ", data=" + ''.join('{:02x}'.format(x) for x in data))
@@ -147,26 +141,6 @@ class Csp(object):
                 print("\thex:", data_hex[0:2], data_hex[2:])
                 print("\thex payload converted to int:", int(data_hex[2:], 16))
                 received.append(int(data_hex[2:], 16))
-
-
-class GracefulExiter():
-    """
-    Allows us to exit while loops with CTRL+C.
-    (When we cannot get a connection for some reason.)
-    By Esben Folger Thomas https://stackoverflow.com/a/57649638
-    """
-    def __init__(self):
-        self.state = False
-        signal.signal(signal.SIGINT, self.flip_true)
-    def flip_true(self, signum, frame):
-        print("exit flag set to True (repeat to exit now)")
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        self.state = True
-    def reset(self):
-        self.state = False
-        signal.signal(signal.SIGINT, self.flip_true)
-    def exit(self):
-        return self.state
 
 
 def getOptions():
@@ -178,7 +152,6 @@ def getOptions():
 if __name__ == "__main__":
     opts = getOptions()
     csp = Csp(opts)
-    flag = GracefulExiter()
     sock = libcsp.socket()
     libcsp.bind(sock, libcsp.CSP_ANY)
 
@@ -186,6 +159,6 @@ if __name__ == "__main__":
         try:
             toSend, server, port = csp.getInput(prompt="to send: ")
             csp.send(server, port, toSend);
-            csp.receive(sock, flag)
+            csp.receive(sock)
         except Exception as e:
             print(e)
