@@ -154,6 +154,45 @@ class SystemValues(object):
                                 'err': '>b'  # err
                             }
                         }
+                    },
+                    'SET_TASK_DELAY' : {
+                        'subPort' : 1,
+                        'inoutInfo' : {
+                            'args' : ['>u4', '>u4'],
+                            'returns': {
+                                'err': '>b'
+                            }
+                        }
+                    },
+                    'GET_TASK_DELAY' : {
+                        'subPort' : 2,
+                        'inoutInfo' : {
+                            'args' : ['>u4'],
+                            'returns' : {
+                                'err' : '>b',
+                                'delay' : '>u4'
+                            }
+                        }
+                    },
+                    'GET_TASK_INFO' : {
+                        'subPort' : 3,
+                        'inoutInfo' : {
+                            'args' : None,
+                            'returns' : {
+                                'err' : '>b',
+                                'list' : '>S100'
+                            }
+                        }
+                    },
+                    'GET_TASK_HIGH_WATERMARK' : {
+                        'subPort' : 3,
+                        'inoutInfo' : {
+                            'args' : ['>u4'],
+                            'returns' : {
+                                'err' : '>b',
+                                'watermark' : '>u8'
+                            }
+                        }
                     }
                 }
             },
