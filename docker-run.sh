@@ -1,2 +1,3 @@
 #!/bin/bash
-docker run --rm -it --volumes-from satellite-sim ground_station:latest
+export GS_HOME=$(pwd)
+docker run --rm -it -v $GS_HOME:/home/gs ground_station:latest

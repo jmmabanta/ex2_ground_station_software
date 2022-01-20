@@ -36,8 +36,8 @@ RUN python3 waf configure --with-os=posix --enable-can-socketcan --enable-rdp --
 RUN python3 waf build
 
 WORKDIR /home/gs
-COPY . .
-CMD LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I fifo
+#COPY . .
+#CMD LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I fifo
 
 # FROM ubuntu:latest
 

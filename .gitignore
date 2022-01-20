@@ -129,3 +129,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Local sqlite3 db for logging
+# FIXME: Currently using symlink to website repo. A better solution should be used later
+src/groundStation/dev.db
