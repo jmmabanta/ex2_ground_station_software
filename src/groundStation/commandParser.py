@@ -21,6 +21,7 @@
 import numpy as np
 import re
 from groundStation.system import SystemValues
+from groundStation.logger import Logger
 
 
 class CommandParser(object):
@@ -28,6 +29,7 @@ class CommandParser(object):
     def __init__(self):
         # Contructor
         self.vals = SystemValues()
+        self.logger = Logger()
 
     ''' PUBLIC METHODS '''
 
@@ -78,6 +80,7 @@ class CommandParser(object):
             print('No such subservice')
             return None
 
+        self.logger.log_command(input, tokens[self.vals.appIdx])
         return self._command
 
     def parseReturnValue(self, src, dst, dport, data, length):
@@ -114,7 +117,7 @@ class CommandParser(object):
             #Variable size config return
                 outputObj[retVal] = np.frombuffer( data, dtype = self.vals.varTypes[outputObj['type']], count=1, offset=idx)[0]
                 return outputObj
-                
+
             else:
                 outputObj[retVal] = np.frombuffer(
                     data, dtype=returns[retVal], count=1, offset=idx)[0]
@@ -153,7 +156,7 @@ class CommandParser(object):
         for i in range(0, len(args)):
             if inoutInfo['args'][i]:
                 if inoutInfo['args'][i] == 'var':
-                    #Variable size config arg               
+                    #Variable size config arg
                     nparr = np.array([args[i]], dtype=self.vals.varTypes[outArgs[-1]])
                 else :
                     nparr = np.array([args[i]], dtype=inoutInfo['args'][i])
