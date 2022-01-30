@@ -18,20 +18,26 @@
 """
 import datetime
 import sqlite3
+import os
 
 class Logger:
     def __init__(self, db='src/groundStation/dev.db') -> None:
-        self.__connection = sqlite3.connect(db)
-        self.__cursor = self.__connection.cursor()
+        self.disabled = False
+        if os.path.isfile(db):
+            self.__connection = sqlite3.connect(db)
+            self.__cursor = self.__connection.cursor()
+        else:
+            self.disabled = True
 
     def log_command(self, command, recv, sender='cli'): # FIXME: User
-        data = [command.upper(), datetime.datetime.now(), sender, recv]
-        self.__cursor.execute("""INSERT INTO communications
-                                 (message, timestamp, sender, receiver)
-                                 VALUES (?, ?, ?, ?)""", data)
-        self.__connection.commit()
+        if not self.disabled:
+            data = [command.upper(), datetime.datetime.now(), sender, recv]
+            self.__cursor.execute("""INSERT INTO communications
+                                    (message, timestamp, sender, receiver)
+                                    VALUES (?, ?, ?, ?)""", data)
+            self.__connection.commit()
 
     def __del__(self) -> None:
-        super()
-        self.__connection.commit() # Save any lingering changes
-        self.__connection.close()
+        if not self.disabled:
+            self.__connection.commit() # Save any lingering changes
+            self.__connection.close()

@@ -1,3 +1,5 @@
+# This version will NOT copy the repo into container, but will
+# rely on mounting the host's repo when running.
 FROM ubuntu:latest
 
 WORKDIR /
@@ -36,8 +38,8 @@ RUN python3 waf configure --with-os=posix --enable-can-socketcan --enable-rdp --
 RUN python3 waf build
 
 WORKDIR /home/gs
-COPY . .
-CMD LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I fifo
+#COPY . .
+#CMD LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I fifo
 
 # FROM ubuntu:latest
 
