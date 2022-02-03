@@ -29,7 +29,7 @@ class Logger:
         else:
             self.disabled = True
 
-    def log_command(self, command, recv, sender='cli'): # FIXME: User
+    def log_command(self, command, recv='logs', sender='cli'): # FIXME: User
         if not self.disabled:
             data = [command.upper(), datetime.datetime.now(), sender, recv]
             self.__cursor.execute("""INSERT INTO communications

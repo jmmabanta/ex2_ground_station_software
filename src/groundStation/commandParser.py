@@ -80,7 +80,7 @@ class CommandParser(object):
             print('No such subservice')
             return None
 
-        self.logger.log_command(input, tokens[self.vals.appIdx])
+        self.logger.log_command(input)
         return self._command
 
     def parseReturnValue(self, src, dst, dport, data, length):
