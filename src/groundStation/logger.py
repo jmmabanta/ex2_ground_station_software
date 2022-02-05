@@ -33,8 +33,8 @@ class Logger:
         if not self.disabled:
             data = [command.upper(), datetime.datetime.now(), sender, recv]
             self.__cursor.execute("""INSERT INTO communications
-                                    (message, timestamp, sender, receiver)
-                                    VALUES (?, ?, ?, ?)""", data)
+                                    (message, timestamp, sender, receiver, is_queued)
+                                    VALUES (?, ?, ?, ?, 0)""", data)
             self.__connection.commit()
 
     def __del__(self) -> None:
