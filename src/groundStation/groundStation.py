@@ -41,6 +41,7 @@ from collections import defaultdict
 from groundStation.commandParser import CommandParser
 from groundStation.system import SystemValues
 import libcsp_py3 as libcsp
+from groundStation.logger import Logger
 # else:
 #     # We're importing this file as a module to use in the website
 #     from ex2_ground_station_software.src.system import SystemValues
@@ -55,7 +56,8 @@ class groundStation(object):
 
     def __init__(self, opts):
         self.myAddr = apps['GND']
-        self.parser = CommandParser()
+        self.logger = Logger()
+        self.parser = CommandParser(self.logger)
         self.server_connection = defaultdict(dict)
         self.number_of_buffers = 100
         self.buffer_size = 1024 #This is max size of an incoming packet
@@ -147,14 +149,14 @@ class groundStation(object):
         return parsed packet """
         conn = self.__connectionManager__(server, port)
         if conn is None:
-            print('Error: Could not connection')
+            self.logger.printLog('Error: Could not connection')
             return {}
         libcsp.send(conn, buf)
         libcsp.buffer_free(buf)
         rxDataList = []
         packet = libcsp.read(conn, 10000)
         if packet is None:
-            print('packet is None; no more packets')
+            self.logger.printLog('packet is None; no more packets')
             return
 
         data = bytearray(libcsp.packet_get_data(packet))
@@ -165,16 +167,16 @@ class groundStation(object):
             libcsp.conn_sport(conn),
             data,
             length))
-        
+
         if rxDataList is None:
-            print('ERROR: bad response data')
+            self.logger.printLog('ERROR: bad response data')
             return
 
         #code following is specific to housekeeping multi-packet transmission
         if  (
-            libcsp.conn_src(conn) != vals.APP_DICT.get('OBC') or 
-            libcsp.conn_sport(conn) != vals.SERVICES.get('HOUSEKEEPING').get('port') or 
-            data[0] != vals.SERVICES.get('HOUSEKEEPING').get('subservice').get('GET_HK').get('subPort') or 
+            libcsp.conn_src(conn) != vals.APP_DICT.get('OBC') or
+            libcsp.conn_sport(conn) != vals.SERVICES.get('HOUSEKEEPING').get('port') or
+            data[0] != vals.SERVICES.get('HOUSEKEEPING').get('subservice').get('GET_HK').get('subPort') or
             data[2] != 1 #marker in housekeeping data signifying more incoming data
             ):
             return rxDataList[0]

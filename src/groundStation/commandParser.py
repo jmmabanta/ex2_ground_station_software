@@ -26,10 +26,13 @@ from groundStation.logger import Logger
 
 class CommandParser(object):
 
-    def __init__(self):
+    def __init__(self, logger: Logger = None):
         # Contructor
         self.vals = SystemValues()
-        self.logger = Logger()
+        if (logger == None):
+            self.logger = Logger()
+        else:
+            self.logger = logger
 
     ''' PUBLIC METHODS '''
 
@@ -80,7 +83,7 @@ class CommandParser(object):
             print('No such subservice')
             return None
 
-        self.logger.log_command(input)
+        self.logger.log(input) # Only successful commands will be logged
         return self._command
 
     def parseReturnValue(self, src, dst, dport, data, length):

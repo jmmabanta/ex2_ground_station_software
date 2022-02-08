@@ -21,6 +21,12 @@ import sqlite3
 import os
 
 class Logger:
+    """Logs commands + responses to communication table in
+    ex2_ground_station_website/groundStation.
+
+    Will automatically disable itself if DATABASE_URL is not set in .env
+    prior to starting the docker container.
+    """
     def __init__(self, db='src/groundStation/dev.db') -> None:
         self.disabled = False
         if os.path.isfile(db):
@@ -29,7 +35,8 @@ class Logger:
         else:
             self.disabled = True
 
-    def log_command(self, command, recv='logs', sender='cli'): # FIXME: User
+    def log(self, command: str, recv='logs', sender='cli'): # FIXME: User
+        """Logs the command to the communications table in the db."""
         if not self.disabled:
             data = [command.upper(), datetime.datetime.now(), sender, recv]
             self.__cursor.execute("""INSERT INTO communications
@@ -37,7 +44,13 @@ class Logger:
                                     VALUES (?, ?, ?, ?, 0)""", data)
             self.__connection.commit()
 
+    def printLog(self, output: str, recv='logs', sender='cli'):
+        """Prints to standard output and logs that same output to db."""
+        print(output)
+        self.log(output, recv, sender)
+
     def __del__(self) -> None:
+        """Saves any lingering changes to the db before closing."""
         if not self.disabled:
-            self.__connection.commit() # Save any lingering changes
+            self.__connection.commit()
             self.__connection.close()
