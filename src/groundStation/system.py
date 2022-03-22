@@ -164,7 +164,16 @@ class SystemValues(object):
                                 'err': '>b'  # err
                             }
                         }
-                    }
+                    },
+                    'DEPLOY_SWITCH': {
+                        'subPort': 1,
+                        'inoutInfo': {
+                            'args': ['>B'],  # switch #. DFGM=0, UHF_P=1, UHF_Z=2, UHF_S=3, UHF_N=4. Solar panels: Port=5, Payload=6, Starboard=7.
+                            'returns': {
+                                'err': '>b'  # switch status
+                            }
+                        }
+                    },
                 }
             },
             'COMMUNICATION': {
