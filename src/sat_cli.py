@@ -12,17 +12,17 @@
  * GNU General Public License for more details.
 '''
 '''
- * @file test.py
- * @author Andrew Rooney
- * @date 2020-11-20
+ * @file sat_cli.py
+ * @author Robert Taylor
+ * @date 2021-12-21
 '''
 
 '''  to run > sudo LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I uart -d /dev/ttyUSB1  '''
 import time
-from groundStation import groundStation
+from groundStation import groundStation, cliGroundStation
 
 opts = groundStation.options()
-gs = groundStation.groundStation(opts.getOptions())
+gs = cliGroundStation.cliGroundStation(opts.getOptions())
 flag = groundStation.GracefulExiter()
 
 def cli():
@@ -32,22 +32,9 @@ def cli():
             flag.reset()
             return
         try:
-            server, port, toSend = gs.getInput(prompt='to send: ')
-            if server == 24:
-                # This is a direct UART command to a ground station EnduroSat transceiver to enter PIPE
-                # Can be deleted for flight
-                gs.__setPIPE__()
-            else:
-                resp = gs.transaction(server, port, toSend)
-
-                #checks if housekeeping multiple packets. if so, a list of dictionaries is returned
-                if type(resp) == list:
-                    for rxData in resp:
-                        print("--------------------------------------------------------------------------")
-                        [print(key,':',value) for key, value in rxData.items()]
-                #else, only a single dictionary is returned
-                else:
-                    [print(key,':',value) for key, value in resp.items()]
+            cmd = input("$ ")
+            server, port, toSend = gs.getInput(cmd, inVal="obc.cli.send_cmd({},{})".format(len(cmd), cmd))
+            gs.transaction(server, port, toSend)
             
         except Exception as e:
             print(e)
