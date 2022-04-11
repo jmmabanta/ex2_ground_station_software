@@ -173,7 +173,7 @@ class groundStation(object):
         rxDataList = []
         packet = libcsp.read(conn, 10000)
         if packet is None:
-            self.logger.printLog('packet is None; no more packets')
+            print('packet is None; no more packets')
             return
 
         data = bytearray(libcsp.packet_get_data(packet))

@@ -20,10 +20,12 @@
 '''  to run > sudo LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I uart -d /dev/ttyUSB1  '''
 import time
 from groundStation import groundStation
+from groundStation import logger
 
 opts = groundStation.options()
 gs = groundStation.groundStation(opts.getOptions())
 flag = groundStation.GracefulExiter()
+logs = logger.Logger()
 
 def cli():
     while True:
@@ -32,13 +34,17 @@ def cli():
             flag.reset()
             return
         try:
-            server, port, toSend = gs.getInput(prompt='to send: ')
+            command = input('to send: ')
+            logs.log(command)
+            server, port, toSend = gs.getInput(inVal=command)
             if server == 24:
                 # This is a direct UART command to a ground station EnduroSat transceiver to enter PIPE
                 # Can be deleted for flight
                 gs.__setPIPE__()
             else:
                 resp = gs.transaction(server, port, toSend)
+                # Keep multiple packets as one communications object in db
+                logs.log(resp)
 
                 #checks if housekeeping multiple packets. if so, a list of dictionaries is returned
                 if type(resp) == list:
@@ -48,9 +54,9 @@ def cli():
                 #else, only a single dictionary is returned
                 else:
                     [print(key,':',value) for key, value in resp.items()]
-            
+
         except Exception as e:
-            print(e)
+            logs.printLog(e)
 
 if __name__ == '__main__':
     flag = groundStation.GracefulExiter()
