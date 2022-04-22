@@ -13,17 +13,19 @@
 '''
 '''
  * @file test.py
- * @author Andrew Rooney
+ * @author Andrew Rooney, Daniel Sacro
  * @date 2020-11-20
 '''
 
 '''  to run > sudo LD_LIBRARY_PATH=../libcsp/build PYTHONPATH=../libcsp/build python3 src/cli.py -I uart -d /dev/ttyUSB1  '''
 import time
 from groundStation import groundStation
+from FT_handler import FT_handler
 
 opts = groundStation.options()
 gs = groundStation.groundStation(opts.getOptions())
 flag = groundStation.GracefulExiter()
+ft_handler = FT_handler()
 
 def cli():
     while True:
@@ -37,6 +39,18 @@ def cli():
                 # This is a direct UART command to a ground station EnduroSat transceiver to enter PIPE
                 # Can be deleted for flight
                 gs.__setPIPE__()
+            elif port == 20:
+                # A command was issued specifically to the 2U Payload File Transferring Service (port 20)
+                resp = gs.transaction(server, port, toSend)
+
+                # TODO - Somehow check what subport it's going to (in order to know whether it's a downlink, uplink, or stop FT)
+                # TODO - Also check what arguments are being taken (in order to know what file to open)
+
+                # TODO - Implement a check that ensures that subservices 4 and 5 are NOT accessible by SC operators
+
+                if resp['err'] == 0:
+                    # Only begin file transfer process if OBC is ready to begin as well
+                    ft_handler.handle_FT() # NOTE - This method takes 2 arguments: a mode (either "downlink" or "uplink") and a filename
             else:
                 resp = gs.transaction(server, port, toSend)
 

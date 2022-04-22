@@ -3135,5 +3135,59 @@ class SystemValues(object):
                         }
                     }
                 }
+            },
+            'FT_2U_PAYLOAD': {
+                'port': 20,
+                'subservice': {
+                    'FT_2U_PAYLOAD_DOWNLINK': {
+                        'subPort': 0,
+                        'inoutInfo': {
+                            'args': None, # TODO - Argument should be a filename as a string or array of bytes
+                            'returns': {
+                                'err': '>b'
+                            }
+                        }
+                    },
+                    'FT_2U_PAYLOAD_UPLINK': {
+                        'subPort': 1,
+                        'inoutInfo': {
+                            'args': None, # TODO - Argument should be a filename as a string or array of bytes
+                            'returns': {
+                                'err': '>b'
+                            }
+                        }
+                    },
+                    'FT_2U_PAYLOAD_STOP_FT': {
+                        'subPort': 2,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b'
+                            }
+                        }
+                    },
+                    'FT_2U_PAYLOAD_SEND_BYTES': {
+                        'subPort': 3,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b',
+                                # TODO - Should return 'bytesToRead' (total number of file data bytes inside return packet)
+                                # TODO - Should also return a byte array containing N bytes of file data from the OBC
+                            }
+                        }
+                    },
+                    'FT_2U_PAYLOAD_PROCESS_BYTES': {
+                        'subPort': 4,
+                        'inoutInfo': {
+                            'args': None, 
+                            # TODO - Arguments should be 'bytesToRead' (total file data bytes inside subservice packet) 
+                            # TODO - Arguments should also include a byte array containing N bytes of file data
+                            'returns': {
+                                'err': '>b'
+                            }
+                        }
+                    }
+                }
             }
         }
