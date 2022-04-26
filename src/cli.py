@@ -41,16 +41,16 @@ def cli():
                 gs.__setPIPE__()
             elif port == 20:
                 # A command was issued specifically to the 2U Payload File Transferring Service (port 20)
+                # Send the subservice command to the OBC to prepare it for file transferring
                 resp = gs.transaction(server, port, toSend)
 
-                # TODO - Somehow check what subport it's going to (in order to know whether it's a downlink, uplink, or stop FT)
-                # TODO - Also check what arguments are being taken (in order to know what file to open)
+                # Check what mode of file transfer is being called + the name of the file that is being transferred
+                # NOTE - 1 = FAIL, 2 = DOWNLINK, and 3 = UPLINK for 'err' return value
+                FT_mode = resp['err'] 
+                filename = resp['filename']
 
-                # TODO - Implement a check that ensures that subservices 4 and 5 are NOT accessible by SC operators
-
-                if resp['err'] == 0:
-                    # Only begin file transfer process if OBC is ready to begin as well
-                    ft_handler.handle_FT() # NOTE - This method takes 2 arguments: a mode (either "downlink" or "uplink") and a filename
+                # NOTE - FT_handler class automatically does error handling for the mode
+                ft_handler.handle_FT(FT_mode, filename)          
             else:
                 resp = gs.transaction(server, port, toSend)
 

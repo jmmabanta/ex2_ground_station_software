@@ -25,10 +25,32 @@ class FT_handler(object):
     def handle_FT(self, mode, filename):
         # Starts all while loops
         bytesToRead = 900
+        
+        # NOTE - if mode = 0 (success) nothing should happen since 0 is only returned for subservices 3-5, 
+        # which are STOP_FT, SEND_BYTES, and PROCESS_BYTES. The first of the three can only stop file
+        # transfers and can't return a mode 2 or 3. Similarly, the last two of the three also can't return
+        # modes 2 or 3 and additionally should NOT be accessible by SC operators. Only the FT_handler
+        # should have access to subservices 4 and 5 so that it can automatically handle the file transfer
+        # process
 
-        if mode == "downlink":
-            toReceive = open(filename, 'wb')
-            while bytesToRead == 900:
+        if mode == 1:
+            # Mode 1 = fail -> Some subservice command fails for some reason, close any opened files on the OBC
+            print("Something failed on the OBC!")
+            server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
+            resp = gs.transaction(server, port, toSend)
+        elif mode == 2:
+            # Mode 2 = downlink
+            fileIsOpen = True
+            try:
+                toReceive = open(filename, 'wb')
+            except:
+                # If file can't be opened, abort file transfer
+                print("File can't be opened on the GS for " + str(filename) + "!")
+                fileIsOpen = False
+                server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
+                resp = gs.transaction(server, port, toSend)
+
+            while bytesToRead == 900 and fileIsOpen:
                 # Tell OBC to send file data to GS
                 server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_SEND_BYTES')
                 resp = gs.transaction(server, port, toSend)
@@ -49,14 +71,17 @@ class FT_handler(object):
                     server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
                     resp = gs.transaction(server, port, toSend)
                     break
+                
             # Close file after FT is finished or aborted
             toReceive.close()
-        elif mode == "uplink":
+        elif mode == 3:
+            # Mode 3 = uplink
             fileExists = True
             try:
                 toSend = open(filename, 'rb')
             except:
                 # If file doesn't exist, abort file transfer
+                print(str(filename) + " doesn't exist on the GS!")
                 fileExists = False
                 server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
                 resp = gs.transaction(server, port, toSend)
@@ -83,6 +108,7 @@ class FT_handler(object):
                     server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
                     resp = gs.transaction(server, port, toSend)
                     break
+                
             # Close file after FT is finished or aborted
             toSend.close()
         return
