@@ -24,7 +24,11 @@ gs = groundStation.groundStation(opts.getOptions())
 class FT_handler(object):
     def handle_FT(self, mode, filename):
         # Starts all while loops
-        bytesToRead = 900
+        # TODO - maxBytesToRead can and should be changed to a higher value to speed up file transfers
+        # NOTE - If you increase maxBytesToRead, you should add in more '>u4" variables to the subservice
+        # commands 4 and 5 in system.py
+        maxBytesToRead = 100 
+        bytesToRead = maxBytesToRead
         
         # NOTE - if mode = 0 (success) nothing should happen since 0 is only returned for subservices 3-5, 
         # which are STOP_FT, SEND_BYTES, and PROCESS_BYTES. The first of the three can only stop file
@@ -41,6 +45,7 @@ class FT_handler(object):
         elif mode == 2:
             # Mode 2 = downlink
             fileIsOpen = True
+            writeFailed = False
             try:
                 toReceive = open(filename, 'wb')
             except:
@@ -50,7 +55,7 @@ class FT_handler(object):
                 server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
                 resp = gs.transaction(server, port, toSend)
 
-            while bytesToRead == 900 and fileIsOpen:
+            while bytesToRead == maxBytesToRead and fileIsOpen:
                 # Tell OBC to send file data to GS
                 server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_SEND_BYTES')
                 resp = gs.transaction(server, port, toSend)
@@ -59,17 +64,23 @@ class FT_handler(object):
                     print("File read failed on the satellite!")
                     break
 
+                # Save bytes from CSP packet
                 bytesToRead = resp['bytesToRead']
-                # TODO - Places bytes from CSP packet into a buffer
-                # NOTE - Also ensure that the bytes are in binary (i.e. b'')
+                for i in range(1, bytesToRead + 1):
+                    index = "block" + str(i)
+                    # Format value into binary
+                    buffer = format(resp[index], "b")
+                    try:
+                        toReceive.write(buffer)
+                    except:
+                        # If a file write fails on the ground station, abort file transfer
+                        print("File write failed on the ground station!")
+                        writeFailed = True
+                        server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
+                        resp = gs.transaction(server, port, toSend)
+                        break
 
-                try:
-                    toReceive.write(buffer)
-                except:
-                    # If a file write fails on the ground station, abort file transfer
-                    print("File write failed on the ground station!")
-                    server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
-                    resp = gs.transaction(server, port, toSend)
+                if writeFailed:
                     break
                 
             # Close file after FT is finished or aborted
@@ -86,9 +97,9 @@ class FT_handler(object):
                 server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_STOP_FT')
                 resp = gs.transaction(server, port, toSend)
 
-            while bytesToRead == 900 and fileExists:
+            while bytesToRead == maxBytesToRead and fileExists:
                 try:
-                    buffer = toSend.read(bytesToRead)
+                    byteBuffer = toSend.read(maxBytesToRead)
                 except:
                     # If a file read fails on ground station, abort file transfer
                     print("File read failed on the ground station!")
@@ -96,11 +107,35 @@ class FT_handler(object):
                     resp = gs.transaction(server, port, toSend)
                     break
 
-                # TODO - Update bytesToRead somehow
-                # TODO - Place data into a CSP packet somehow
+                # Update bytesToRead
+                bytesToRead = len(byteBuffer)
+                bytesArrayBuffer = bytearray(byteBuffer)
+
+                # Pad buffer with 0-bytes
+                if bytesToRead < maxBytesToRead:
+                    for i in range(0, maxBytesToRead - bytesToRead):
+                        bytesArrayBuffer.append(0)
+
+                # Place data into a CSP packet 
+                command = 'obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_PROCESS_BYTES(' + str(bytesToRead)
+                block = bytearray(b'')
+                byteCount = 0
+                for byte in bytesArrayBuffer:
+                    if byteCount < 4:
+                        # Place 4 bytes into a "block"
+                        block.append(byte) 
+                        byteCount += 1
+                    else:
+                        # Convert this "block" of 4 bytes into an unsigned integer and place into command as an argument
+                        command += ',' + str(int.from_bytes(block, "big"))
+                        # Reset block and counters
+                        block = bytearray('b')
+                        byteCount = 0
+                # Close command with bracket at the end
+                command += ')'
 
                 # Tell OBC to process file data from the GS
-                server, port, toSend = gs.getInput(inVal='obc.FT_2U_PAYLOAD.FT_2U_PAYLOAD_PROCESS_BYTES')
+                server, port, toSend = gs.getInput(inVal=command)
                 resp = gs.transaction(server, port, toSend)
                 if resp['err'] != 0:
                     # If a file write on the satellite goes wrong, abort file transfer

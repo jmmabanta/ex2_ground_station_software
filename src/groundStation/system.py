@@ -3173,17 +3173,45 @@ class SystemValues(object):
                         'inoutInfo': {
                             'args': None,
                             'returns': {
+                                # NOTE - There may be bugs with this current implementation of file transferring (like endianness, etc.). Requires testing!
                                 'err': '>b',
-                                'bytesToRead': '>u2' # Total number of data file bytes stored in the packet from the OBC
-                                # TODO - Should also return a byte array containing N bytes of file data from the OBC (N = 900)
+                                'bytesToRead': '>u2', # Total number of data file bytes stored in the packet from the OBC
+                                'block1': '>u4', # A "block" of 4 file data bytes (There is a total of 100 data bytes here so far)
+                                'block2': '>u4',
+                                'block3': '>u4',
+                                'block4': '>u4',
+                                'block5': '>u4',
+                                'block6': '>u4',
+                                'block7': '>u4',
+                                'block8': '>u4',
+                                'block9': '>u4',
+                                'block10': '>u4',
+                                'block11': '>u4',
+                                'block12': '>u4',
+                                'block13': '>u4',
+                                'block14': '>u4',
+                                'block15': '>u4',
+                                'block16': '>u4',
+                                'block17': '>u4',
+                                'block18': '>u4',
+                                'block19': '>u4',
+                                'block20': '>u4',
+                                'block21': '>u4',
+                                'block22': '>u4',
+                                'block23': '>u4',
+                                'block24': '>u4',
+                                'block25': '>u4',
                             }
                         }
                     },
                     'FT_2U_PAYLOAD_PROCESS_BYTES': {
                         'subPort': 4,
                         'inoutInfo': {
-                            'args': ['>u2'], # Total number of data file bytes stored in the packet to the OBC
-                            # TODO - Arguments should also include a byte array containing N bytes of file data (N = 900)
+                            # NOTE - There may be bugs with this current implementation of file transferring. Requires testing!
+                            'args': ['>u2', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4',
+                            '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4', '>u4'], 
+                            # >u2 = Total number of data file bytes stored in the packet to the OBC
+                            # >u4 = 4 file data bytes (There are a total of 100 data bytes so far)
                             'returns': {
                                 'err': '>b'
                             }
