@@ -51,13 +51,12 @@ Numpy types (> for BE)
 
 import numpy as np
 
-
 class SystemValues(object):
     def __init__(self):
         self.appIdx = 0
         self.serviceIdx = 2
         self.subserviceIdx = 4
-        
+
         self.varTypes = {
             0: '<u1',
             1: '<i1',
