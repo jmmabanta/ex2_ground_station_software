@@ -2,7 +2,7 @@
 Note: arguments and return types are given as numpy types
 
 
-SET_PIPE.UHF_GS_PIPE:
+SET_PIPE_TEST.UHF_GS_PIPE:
 		About: None
 		Arguments: [None]
 		return values: {'err': '>b'}
