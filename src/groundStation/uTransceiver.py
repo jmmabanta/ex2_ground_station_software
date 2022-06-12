@@ -62,21 +62,17 @@ class uTransceiver(object):
         socket = context.socket(zmq.SUB)
         socket.connect("tcp://localhost:%s" % self.rxport)
         socket.setsockopt(zmq.SUBSCRIBE, b"")
-
         # Initialize poll set
         poller = zmq.Poller()
         poller.register(socket, zmq.POLLIN)
-
         print('Received from UHF:')
         self.listen_en = True
         start = time.time()
         while (time.time() - start) < self.listentimeout_s:
-
             if dict(poller.poll())[socket] == zmq.POLLIN:
                 print(socket.recv(zmq.DONTWAIT))
 
         socket.disconnect("tcp://localhost:%s" % self.rxport)
-
 
     def enterPipeMode(self):
             #current config is for RF mode 5, baudrate = 115200
@@ -91,18 +87,19 @@ class uTransceiver(object):
 
             param = string.split(',')[1]
             param = param.split(')')[0]
-
+            
             #parse param into correct ctypes based on cmdcode
             if cmdcode == 0:
                 paramlist = param.split()
                 paramlist = list(map(int, paramlist))
+
                 arg = (ctypes.c_ubyte * len(paramlist))(*paramlist)
+
             if cmdcode == 6:
                 param = ctypes.c_uint16(param) #TODO check that this works with space after comma in command
                 arg = ctypes.cast(param, ctypes.POINTER(ctypes.c_uint16))
             if cmdcode == 253:
                 pass
-                #TODO implement someday if desired (FRAM usage)
 
             #check command and call relevant functions with args
             if (time.time() - self.last_tx_time) > self.pipetimeout_s:
@@ -114,13 +111,12 @@ class uTransceiver(object):
                     self.uhf.UHF_genericRead(cmdcode, voidptr)
                 if cmd == 'genericI2C':
                     pass
-                    #TODO implement someday
-                    #retval = uhf.UHF_genericI2C(cmd, ...)
 
                 #This should be a catch-all for any syntax errors as-is
                 #TODO: make more robust handler for incorrect inputs to prevent erronious commands being sent?
                 if retval != 0:
                     print('UHF Equipment Handler error ' + UHF_return(retval).name)
+
                 time.sleep(0.2)#to prevent csp packet transmission interrupting UHFDIR command transmission (sleeping length not yet optimized)
 
             else:

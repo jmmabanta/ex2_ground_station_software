@@ -50,7 +50,7 @@ def cli():
                 #else, only a single dictionary is returned
                 else:
                     [print(key,':',value) for key, value in resp.items()]
-            
+
         except Exception as e:
             print(e)
 

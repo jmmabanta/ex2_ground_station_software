@@ -36,6 +36,7 @@ import os
 import re
 import serial
 from collections import defaultdict
+
 try:
     from .uTransceiver import uTransceiver
 except:
@@ -88,10 +89,9 @@ class groundStation(object):
         except:
             print("uTranceiver module not built!!")
             self.uTrns = None
-
         self.uTrns_enable = opts.u
         self.set_satellite(opts.satellite)
-
+        
     """ Private Methods """
 
     def __fifo__(self):
@@ -185,7 +185,7 @@ class groundStation(object):
                 print(e + '\n')
                 return
         elif prompt is not None:
-            inStr = input(prompt)
+            inStr = input(prompt)#TODO maybe add uhf-checker here!
             try:
                 if(inStr.split("_")[0] == 'UHFDIR'): #UHF-direct command, not using CSP
                     self.uTrns.UHFDIRCommand(inStr)
@@ -319,7 +319,7 @@ class groundStation(object):
         if self.uTrns_enable == True:
             if (time.time() - self.uTrns.last_tx_time) > self.uTrns.pipetimeout_s:
                 self.uTrns.enterPipeMode()
-                #may need to add delay here?
+                #may need to add delay here
                 command, port, toSend = self.getInput(inVal= self.satellite +'.general.UHF_IS_IN_PIPE_NOTIFICATION(1)')
                 self.transaction(command, port, toSend)
             self.uTrns.last_tx_time = time.time()
@@ -389,6 +389,8 @@ class options(object):
             default='15000', # 15 seconds
             help='RDP connection timeout')
         
+        self.parser.add_argument('-u', action='store_true')#UHF connection (not uart) enabled
+
         self.parser.add_argument('-u', action='store_true')#UHF connection (not uart) enabled
 
         self.parser.add_argument(
