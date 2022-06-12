@@ -736,7 +736,7 @@ class SystemValues(object):
                                 'MIDI': '>S60',
                             }
                         }
-                    },
+                    },                  
                     'UHF_GET_BEACON_MSG': {
                         'what': 'Gets the beacon message',
                         'subPort': 40,
@@ -797,6 +797,28 @@ class SystemValues(object):
                             'returns': {
                                 'err': '>b',
                                 'Secure Key': '>u4',
+                            }
+                        }
+                    },
+                    'UHF_GET_SWVER': {
+                        'what': 'Gets the UHF firmware version',
+                        'subPort': 46,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b',
+                                'ver_XYZ': '>u2',
+                            }
+                        }
+                    },
+                    'UHF_GET_PLDSZ': {
+                        'what': 'Gets UHF device payload size',
+                        'subPort': 47,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b',
+                                'size_B': '>u2',
                             }
                         }
                     },
@@ -1028,7 +1050,14 @@ class SystemValues(object):
                                 'Mag_Field_Vector_X': '>f4',
                                 'Mag_Field_Vector_Y': '>f4',
                                 'Mag_Field_Vector_Z': '>f4',
-                                'Comm_Status': '>i2',
+                                'TC_num': '>i2',
+                                'TM_num': '>i2',
+                                'CommsStat_flags_1': '<B',
+                                'CommsStat_flags_2': '<B',
+                                'CommsStat_flags_3': '<B',
+                                'CommsStat_flags_4': '<B',
+                                'CommsStat_flags_5': '<B',
+                                'CommsStat_flags_6': '<B',                                
                                 'Wheel1_Current': '>f4',
                                 'Wheel2_Current': '>f4',
                                 'Wheel3_Current': '>f4',
@@ -1402,7 +1431,7 @@ class SystemValues(object):
                 'port': 4,  # As per CSP docs
                 # EPS soft reset
                 # Not recommended to use by the operator
-                # no subport (command ID) needed.
+                # no subPort (command ID) needed.
                 'subservice':{
                     'SOFT': {                	
                         'what': 'Does a soft reset on EPS (reboot)',
@@ -1415,7 +1444,7 @@ class SystemValues(object):
                         }
                     }
                 }
-                # magic number 0x80078007 must be sent with csp port 4 and no subport number
+                # magic number 0x80078007 must be sent with csp port 4 and no subPort number
             },
 
             'TM_CLI': {
@@ -1831,11 +1860,11 @@ class SystemValues(object):
                     }
                 }
             },
-            'adcs': { # refer to the adcs service
+            'ADCS': { # refer to the adcs service
                 'port': 18,
                 'subservice': {
                     'ADCS_RESET': {
-                        'subport': 0,
+                        'subPort': 0,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1844,7 +1873,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_RESET_LOG_POINTER': {
-                        'subport': 1,
+                        'subPort': 1,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1853,7 +1882,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_ADVANCE_LOG_POINTER': {
-                        'subport': 2,
+                        'subPort': 2,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1862,7 +1891,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_RESET_BOOT_REGISTERS': {
-                        'subport': 3,
+                        'subPort': 3,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1871,7 +1900,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_FORMAT_SD_CARD': {
-                        'subport': 4,
+                        'subPort': 4,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1880,7 +1909,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_ERASE_FILE': {
-                        'subport': 5,
+                        'subPort': 5,
                         'inoutInfo': {
                             'args': ['>u1', '>u1', '>u1'], #file_type, file_counter, erase_all
                             'returns': {
@@ -1889,7 +1918,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_LOAD_FILE_DOWNLOAD_BLOCK': {
-                        'subport': 6,
+                        'subPort': 6,
                         'inoutInfo': {
                             'args': ['>u1', '>u1', '>u4', '>u2'], #file_type, file_counter, offset, block_length
                             'returns': {
@@ -1898,7 +1927,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_ADVANCE_FILE_LIST_READ_POINTER': {
-                        'subport': 7,
+                        'subPort': 7,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1907,7 +1936,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_INITIATE_FILE_UPLOAD': {
-                        'subport': 8,
+                        'subPort': 8,
                         'inoutInfo': {
                             'args': ['>u1', '>u1'], # file_dest, block_size
                             'returns': {
@@ -1916,7 +1945,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_FILE_UPLOAD_PACKET': {
-                        'subport': 9,
+                        'subPort': 9,
                         'inoutInfo': {
                             'args': ['>u2', '>u1'], # packet_number, file_bytes
                             'returns': {
@@ -1926,7 +1955,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_FINALIZE_UPLOAD_BLOCK': {
-                        'subport': 10,
+                        'subPort': 10,
                         'inoutInfo': {
                             'args': ['>u2', '>u4', 'u2'], # file_dest, offset, block_length
                             'returns': {
@@ -1935,7 +1964,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_RESET_UPLOAD_BLOCK': {
-                        'subport': 11,
+                        'subPort': 11,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1944,7 +1973,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_RESET_FILE_LIST_READ_POINTER': {
-                        'subport': 12,
+                        'subPort': 12,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1953,7 +1982,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_INITIATE_DOWNLOAD_BURST': {
-                        'subport': 13,
+                        'subPort': 13,
                         'inoutInfo': {
                             'args': ['>u1', '>?'], # msg_legnth, ignore_hole_map
                             'returns': {
@@ -1962,7 +1991,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_NODE_IDENTIFICATION': {
-                        'subport': 14,
+                        'subPort': 14,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1977,7 +2006,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_BOOT_PROGRAM_STAT': {
-                        'subport': 15,
+                        'subPort': 15,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -1990,7 +2019,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_BOOT_INDEX': {
-                        'subport': 16,
+                        'subPort': 16,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2001,7 +2030,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_LAST_LOGGED_EVENT': {
-                        'subport': 17,
+                        'subPort': 17,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2013,7 +2042,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SD_FORMAT_PROCESS': {
-                        'subport': 18,
+                        'subPort': 18,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2024,7 +2053,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_TC_ACK': {
-                        'subport': 19,
+                        'subPort': 19,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2036,7 +2065,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_FILE_DOWNLOAD_BUFFER': {
-                        'subport': 20,
+                        'subPort': 20,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2047,7 +2076,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_FILE_DOWNLOAD_BLOCK_STAT': {
-                        'subport': 21,
+                        'subPort': 21,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2060,7 +2089,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_FILE_INFO': {
-                        'subport': 22,
+                        'subPort': 22,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2074,7 +2103,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_INIT_UPLOAD_STAT': {
-                        'subport': 23,
+                        'subPort': 23,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2084,7 +2113,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_FINALIZE_UPLOAD_STAT': {
-                        'subport': 24,
+                        'subPort': 24,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2095,7 +2124,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_UPLOAD_CRC16_CHECKSUM': {
-                        'subport': 25,
+                        'subPort': 25,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2105,7 +2134,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SRAM_LATCHUP_COUNT': {
-                        'subport': 26,
+                        'subPort': 26,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2116,7 +2145,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_EDAC_ERR_COUNT': {
-                        'subport': 27,
+                        'subPort': 27,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2128,7 +2157,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_COMMS_STAT': {
-                        'subport': 28,
+                        'subPort': 28,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2138,7 +2167,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_CACHE_EN_STATE': {
-                        'subport': 29,
+                        'subPort': 29,
                         'inoutInfo': {
                             'args': ['>?'],
                             'returns': {
@@ -2147,7 +2176,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_SRAM_SCRUB_SIZE': {
-                        'subport': 30,
+                        'subPort': 30,
                         'inoutInfo': {
                             'args': ['>u2'],
                             'returns': {
@@ -2156,7 +2185,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_UNIXTIME_SAVE_CONFIG': {
-                        'subport': 31,
+                        'subPort': 31,
                         'inoutInfo': {
                             'args': ['>u1', '>u1'],
                             'returns': {
@@ -2165,7 +2194,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_HOLE_MAP': {
-                        'subport': 32,
+                        'subPort': 32,
                         'inoutInfo': {
                             'args': ['>u1', '>u1'],
                             'returns': {
@@ -2175,7 +2204,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_UNIX_T': {
-                        'subport': 33,
+                        'subPort': 33,
                         'inoutInfo': {
                             'args': ['>u4', '>u2'],
                             'returns': {
@@ -2184,7 +2213,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_CACHE_EN_STATE': {
-                        'subport': 34,
+                        'subPort': 34,
                         'inoutInfo': {
                             'args': ['>?'],
                             'returns': {
@@ -2194,7 +2223,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SRAM_SCRUB_SIZE': {
-                        'subport': 35,
+                        'subPort': 35,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2204,7 +2233,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_UNIXTIME_SAVE_CONFIG': {
-                        'subport': 36,
+                        'subPort': 36,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2215,7 +2244,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_HOLE_MAP': {
-                        'subport': 37,
+                        'subPort': 37,
                         'inoutInfo': {
                             'args': ['>u1'], #num
                             'returns': {
@@ -2225,7 +2254,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_UNIX_T': {
-                        'subport': 38,
+                        'subPort': 38,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2236,7 +2265,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_CLEAR_ERR_FLAGS': {
-                        'subport': 39,
+                        'subPort': 39,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2245,7 +2274,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_BOOT_INDEX': {
-                        'subport': 40,
+                        'subPort': 40,
                         'inoutInfo': {
                             'args': ['>u1'], #index
                             'returns': {
@@ -2254,7 +2283,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_RUN_SELECTED_PROGRAM': {
-                        'subport': 41,
+                        'subPort': 41,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2263,7 +2292,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_READ_PROGRAM_INFO': {
-                        'subport': 42,
+                        'subPort': 42,
                         'inoutInfo': {
                             'args': ['>u1'], #index
                             'returns': {
@@ -2272,7 +2301,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_COPY_PROGRAM_INTERNAL_FLASH': {
-                        'subport': 43,
+                        'subPort': 43,
                         'inoutInfo': {
                             'args': ['>u1', '>u1'], #index, overwrite_flag
                             'returns': {
@@ -2281,7 +2310,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_BOOTLOADER_STATE': {
-                        'subport': 44,
+                        'subPort': 44,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2292,7 +2321,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_PROGRAM_INFO': {
-                        'subport': 45,
+                        'subPort': 45,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2305,7 +2334,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_COPY_INTERNAL_FLASH_PROGRESS': {
-                        'subport': 46,
+                        'subPort': 46,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2316,7 +2345,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_DEPLOY_MAGNETOMETER_BOOM': {
-                        'subport': 47,
+                        'subPort': 47,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2325,7 +2354,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ENABLED_STATE': {
-                        'subport': 48,
+                        'subPort': 48,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2334,7 +2363,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_CLEAR_LATCHED_ERRS': {
-                        'subport': 49,
+                        'subPort': 49,
                         'inoutInfo': {
                             'args': ['>?', '>?'],
                             'returns': {
@@ -2343,7 +2372,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ATTITUDE_CTR_MODE': {
-                        'subport': 50,
+                        'subPort': 50,
                         'inoutInfo': {
                             'args': ['>u1', '>u2'],
                             'returns': {
@@ -2352,7 +2381,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ATTITUDE_ESTIMATE_MODE': {
-                        'subport': 51,
+                        'subPort': 51,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2361,7 +2390,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_TRIGGER_ADCS_LOOP': {
-                        'subport': 52,
+                        'subPort': 52,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2370,7 +2399,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_TRIGGER_ADCS_LOOP_SIM': {
-                        'subport': 53,
+                        'subPort': 53,
                         'inoutInfo': {
                             'args': None, #TODO: sim_sensor_data type ?
                             'returns': {
@@ -2379,7 +2408,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ASGP4_RUNE_MODE': {
-                        'subport': 54,
+                        'subPort': 54,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2388,7 +2417,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_TRIGGER_ASGP4': {
-                        'subport': 55,
+                        'subPort': 55,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2397,7 +2426,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_MTM_OP_MODE': {
-                        'subport': 56,
+                        'subPort': 56,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2406,7 +2435,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_CNV2JPG': {
-                        'subport': 57,
+                        'subPort': 57,
                         'inoutInfo': {
                             'args': ['>u1', '>u1', '>u1'],
                             'returns': {
@@ -2415,7 +2444,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SAVE_IMG': {
-                        'subport': 58,
+                        'subPort': 58,
                         'inoutInfo': {
                             'args': ['>u1', '>u1'],
                             'returns': {
@@ -2424,7 +2453,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SAVE_CONFIG': {
-                        'subport': 61,
+                        'subPort': 61,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2433,7 +2462,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SAVE_ORBIT_PARAMS': {
-                        'subport': 62,
+                        'subPort': 62,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2442,7 +2471,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_JPG_CNV_PROGESS': {
-                        'subport': 64,
+                        'subPort': 64,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2454,7 +2483,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_CUBEACP_STATE': {
-                        'subport': 65,
+                        'subPort': 65,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2464,7 +2493,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SAT_POS_LLH': {
-                        'subport': 66,
+                        'subPort': 66,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2476,7 +2505,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_EXECUTION_TIMES': {
-                        'subport': 67,
+                        'subPort': 67,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2489,7 +2518,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_ACP_LOOP_STAT': {
-                        'subport': 68,
+                        'subPort': 68,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2500,7 +2529,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_IMG_SAVE_PROGRESS': {
-                        'subport': 69,
+                        'subPort': 69,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2511,7 +2540,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_MEASUREMENTS': {
-                        'subport': 70,
+                        'subPort': 70,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2556,7 +2585,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_ACTUATOR': {
-                        'subport': 71,
+                        'subPort': 71,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2571,7 +2600,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_ESTIMATION': {
-                        'subport': 72,
+                        'subPort': 72,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2601,7 +2630,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_ASGP4': {
-                        'subport': 73,
+                        'subPort': 73,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2618,7 +2647,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_RAW_SENSOR': {
-                        'subport': 74,
+                        'subPort': 74,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2643,7 +2672,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_RAW_GPS': {
-                        'subport': 75,
+                        'subPort': 75,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2672,7 +2701,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_STAR_TRACKER': {
-                        'subport': 76,
+                        'subPort': 76,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2713,7 +2742,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_MTM2_MEASUREMENTS': {
-                        'subport': 77,
+                        'subPort': 77,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2725,7 +2754,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_POWER_TEMP': {
-                        'subport': 78,
+                        'subPort': 78,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2753,7 +2782,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_POWER_CONTROL': {
-                        'subport': 79,
+                        'subPort': 79,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2763,7 +2792,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_POWER_CONTROL': {
-                        'subport': 80,
+                        'subPort': 80,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2773,7 +2802,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ATTITUDE_ANGLE': {
-                        'subport': 81,
+                        'subPort': 81,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4' ], # xyz type
                             'returns': {
@@ -2782,7 +2811,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_ATTITUDE_ANGLE': {
-                        'subport': 82,
+                        'subPort': 82,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2794,7 +2823,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_TRACK_CONTROLLER': {
-                        'subport': 83,
+                        'subPort': 83,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4' ], # xyz type
                             'returns': {
@@ -2803,7 +2832,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_TRACK_CONTROLLER': {
-                        'subport': 84,
+                        'subPort': 84,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2815,7 +2844,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_LOG_CONFIG': {
-                        'subport': 85,
+                        'subPort': 85,
                         'inoutInfo': {
                             'args': ['>O20', '>u2'], # array type?, period
                             'returns': {
@@ -2824,7 +2853,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_LOG_CONFIG': {
-                        'subport': 86,
+                        'subPort': 86,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2837,7 +2866,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_INERTIAL_REF': {
-                        'subport': 87,
+                        'subPort': 87,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4'],
                             'returns': {
@@ -2846,7 +2875,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_INERTIAL_REF': {
-                        'subport': 88,
+                        'subPort': 88,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2858,7 +2887,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_SGP4_ORBIT_PARAMS': {
-                        'subport': 89,
+                        'subPort': 89,
                         'inoutInfo': {
                             'args': ['>f8', '>f8', '>f8', '>f8', '>f8', '>f8', '>f8', '>f8'],
                             'returns': {
@@ -2867,7 +2896,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SGP4_ORBIT_PARAMS': {
-                        'subport': 90,
+                        'subPort': 90,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
@@ -2884,7 +2913,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_SYSTEM_CONFIG': {
-                        'subport': 91,
+                        'subPort': 91,
                         'inoutInfo': {
                             'args': None, #TODO: finish args
                             'returns': {
@@ -2893,7 +2922,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_SYSTEM_CONFIG': {
-                        'subport': 92,
+                        'subPort': 92,
                         'inoutInfo': {
                             'args': None, 
                             'returns': {
@@ -2970,7 +2999,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_MTQ_CONFIG': {
-                        'subport': 93,
+                        'subPort': 93,
                         'inoutInfo': {
                             'args': ['>u1', '>u1', '>u1'],
                             'returns': {
@@ -2979,7 +3008,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_RW_CONFIG': {
-                        'subport': 94,
+                        'subPort': 94,
                         'inoutInfo': {
                             'args': ['>u1'],
                             'returns': {
@@ -2989,7 +3018,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_RATE_GYRO': {
-                        'subport': 95,
+                        'subPort': 95,
                         'inoutInfo': {
                             'args': ['>u1', '>u1', '>u1', '>f4', '>f4', '>f4', '>u1'],
                             'returns': {
@@ -2998,7 +3027,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_CSS_CONFIG': {
-                        'subport': 96,
+                        'subPort': 96,
                         'inoutInfo': {
                             'args': ['>O20', '>O20', '>u1'],
                             'returns': {
@@ -3007,7 +3036,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_STAR_TRACK_CONFIG': {
-                        'subport': 97,
+                        'subPort': 97,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>u2', '>u2', '>u1', '>u1', '>u1', '>u2', '>u1', '>u1', '>u1', '>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>u1', '>u1', '>u1', '>?', '>?', '>u1'],
                             'returns': {
@@ -3016,7 +3045,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_CUBESENSE_CONFIG': {
-                        'subport': 98,
+                        'subPort': 98,
                         'inoutInfo': {
                             'args': None, #TODO: finish args, why does this have so many args ~.~
                             'returns': {
@@ -3025,7 +3054,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_MTM_CONFIG': {
-                        'subport': 99,
+                        'subPort': 99,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>O20'],
                             'returns': {
@@ -3034,7 +3063,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_DETUMBLE_CONFIG': {
-                        'subport': 100,
+                        'subPort': 100,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4'],
                             'returns': {
@@ -3043,7 +3072,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_YWHEEL_CONFIG': {
-                        'subport': 101,
+                        'subPort': 101,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4', '>f4'],
                             'returns': {
@@ -3052,7 +3081,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_TRACKING_CONFIG': {
-                        'subport': 102,
+                        'subPort': 102,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>u1'],
                             'returns': {
@@ -3061,7 +3090,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_MOI_MAT': {
-                        'subport': 103,
+                        'subPort': 103,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4', '>f4', '>f4'],
                             'returns': {
@@ -3070,7 +3099,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ESTIMATION_CONFIG': {
-                        'subport': 104,
+                        'subPort': 104,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>u1', '>u1', '>u1', '>u1'],
                             'returns': {
@@ -3079,7 +3108,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_USERCODED_SETTING': {
-                        'subport': 105,
+                        'subPort': 105,
                         'inoutInfo': {
                             'args': ['>O20', '>O20'],
                             'returns': {
@@ -3088,7 +3117,7 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_SET_ASGP4_SETTING': {
-                        'subport': 106,
+                        'subPort': 106,
                         'inoutInfo': {
                             'args': ['>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>f4', '>u1', '>f4', '>f4', '>u1', '>f4', '>f4', '>u1', '>f4', '>f4', '>u2'],
                             'returns': {
@@ -3097,12 +3126,32 @@ class SystemValues(object):
                         }
                     },
                     'ADCS_GET_FULL_CONFIG': {
-                        'subport': 107,
+                        'subPort': 107,
                         'inoutInfo': {
                             'args': None,
                             'returns': {
                                 'err': '>b',
                                 'ADCS_config': '>O20'
+                            }
+                        }
+                    },
+                    'ADCS_DOWNLOAD_FILE_LIST_TO_OBC': {
+                        'what': 'Saves information about files stored on the ADCS to the OBC. File name VOL0:/adcs/adcs_file_list.txt',
+                        'subPort': 108,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b',
+                            }
+                        }
+                    },
+                    'ADCS_DOWNLOAD_FILE_TO_OBC': {
+                        'what': 'Saves a specified file from the ADCS to the OBC. Inputs args type, counter, size, and OBC file name.',
+                        'subPort': 109,
+                        'inoutInfo': {
+                            'args': ['>B', 'B', '>u4', '>S30'], 
+                            'returns': {
+                                'err': '>b',
                             }
                         }
                     },
@@ -3159,6 +3208,63 @@ class SystemValues(object):
                             }
                         }
                     }
+                }
+            },
+            "FTP_COMMAND": {
+                'port': 20,
+                'subservice': {
+                    'GET_FILE_SIZE': {
+                        'subPort': 0,
+                        'inoutInfo': {
+                            'args': ['>b'], # dummy byte, overwritten by program
+                            'returns': {
+                                'err': '>b',
+                                'size': '>u8',
+                            }
+                        }
+                    },
+                    'REQUEST_BURST_DOWNLOAD': {
+                        'subPort': 1,
+                        'inoutInfo': {
+                            'args': ['>b'], # dummy byte, overwritten by program
+                            'returns': {
+                                'err': '>b',
+                                'mtime': '>u4',
+                                'ctime': '>u4',
+                            }
+                        }
+                    },
+                    'FTP_DATA_PACKET': {
+                        'subPort': 2,
+                        'inoutInfo': {
+                            'args': None,
+                            'returns': {
+                                'err': '>b',
+                                'req_id': '>u4',
+                                'size': '>u4',
+                                'blocknum': '>u2',
+                                'data': 'var'
+                            }
+                        }
+                    },
+                    'FTP_START_UPLOAD': {
+                        'subPort': 3,
+                        'inoutInfo': {
+                            'args': ['>b'], # dummy byte, overwritten by program
+                            'returns': {
+                                'err': '>b',
+                            }
+                        }
+                    },
+                    'FTP_UPLOAD_PACKET': {
+                        'subPort': 4,
+                        'inoutInfo': {
+                            'args': ['>b'], # dummy byte, overwritten by program
+                            'returns': {
+                                'err': '>b',
+                            }
+                        }
+                    },
                 }
             }
         }

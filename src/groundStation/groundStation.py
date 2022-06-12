@@ -36,8 +36,13 @@ import os
 import re
 import serial
 from collections import defaultdict
-from .uTransceiver import uTransceiver
 
+try:
+    from .uTransceiver import uTransceiver
+except:
+    print("uTranceiver module not built!")
+
+from time import sleep
 
 try: # We are importing this file for use on the website (comm.py)
     from ex2_ground_station_software.src.groundStation.commandParser import CommandParser
@@ -52,6 +57,9 @@ class groundStation(object):
     """ Constructor """
 
     def __init__(self, opts):
+        keyfile = open(opts.hkeyfile, "r")
+        hkey = keyfile.read().strip()
+        libcsp.hmac_set_key(hkey, len(hkey))
         self.vals = SystemValues()
         self.apps = self.vals.APP_DICT
         self.myAddr = self.apps['GND']
@@ -75,7 +83,12 @@ class groundStation(object):
         time.sleep(0.2)  # allow router task startup
         self.rdp_timeout = opts.timeout  # 10 seconds
         libcsp.rdp_set_opt(4, self.rdp_timeout, 2000, 0, 1500, 0)
-        self.uTrns = uTransceiver(opts.u)
+        self.uTrns = None
+        try:
+            self.uTrns = uTransceiver(opts.u)
+        except:
+            print("uTranceiver module not built!!")
+            self.uTrns = None
         self.uTrns_enable = opts.u
         self.set_satellite(opts.satellite)
         
@@ -132,7 +145,7 @@ class groundStation(object):
                 if server == 4:
                     conn = libcsp.connect(libcsp.CSP_PRIO_NORM, server, port, 1000, libcsp.CSP_O_CRC32)
                 else:
-                    conn = libcsp.connect(libcsp.CSP_PRIO_NORM, server, port, 1000000000, libcsp.CSP_O_NONE)
+                    conn = libcsp.connect(libcsp.CSP_PRIO_NORM, server, port, 1000000000, libcsp.CSP_SO_HMACREQ)
             except Exception as e:
                 print(e)
                 return None
@@ -166,6 +179,7 @@ class groundStation(object):
             try:
                 if(inVal.split('_')[0] == 'UHFDIR'): #UHF-direct command, not using CSP
                     self.uTrns.UHFDIRCommand(inVal)
+                    return None, None, None
                 command = self.parser.parseInputValue(inVal)
             except Exception as e:
                 print(e + '\n')
@@ -186,6 +200,7 @@ class groundStation(object):
 
         if command is None:
             print('Error: Command was not parsed')
+            print(inVal)
             return
 
         toSend = libcsp.buffer_get(len(command['args']))
@@ -304,12 +319,9 @@ class groundStation(object):
         if self.uTrns_enable == True:
             if (time.time() - self.uTrns.last_tx_time) > self.uTrns.pipetimeout_s:
                 self.uTrns.enterPipeMode()
-                #may need to add delay here?
-                command = self.parser.parseInputValue('obc.general.UHF_IS_IN_PIPE_NOTIFICATION(1)')
-                toSend = libcsp.buffer_get(len(command['args']))
-                if len(command['args']) > 0:
-                    libcsp.packet_set_data(toSend, command['args'])
-                self.transaction(command['dst'], command['dport'], toSend)
+                #may need to add delay here
+                command, port, toSend = self.getInput(inVal= self.satellite +'.general.UHF_IS_IN_PIPE_NOTIFICATION(1)')
+                self.transaction(command, port, toSend)
             self.uTrns.last_tx_time = time.time()
 
     def get_satellite(self):
@@ -352,6 +364,11 @@ class options(object):
 
     def getOptions(self):
         self.parser.add_argument(
+            '--hkeyfile',
+            type=str,
+            default="test_key.dat",
+            help='Key to use for CSP HMAC')
+        self.parser.add_argument(
             '-I',
             '--interface',
             type=str,
@@ -371,6 +388,8 @@ class options(object):
             type=int,
             default='15000', # 15 seconds
             help='RDP connection timeout')
+        
+        self.parser.add_argument('-u', action='store_true')#UHF connection (not uart) enabled
 
         self.parser.add_argument('-u', action='store_true')#UHF connection (not uart) enabled
 
