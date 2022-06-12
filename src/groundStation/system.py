@@ -76,7 +76,7 @@ class SystemValues(object):
             'LAST': 31
         }
         self.SERVICES = {
-            'SET_PIPE': {
+            'SET_PIPE_TEST': {
                 # This service is used to tell the GS UHF to get into pipe mode, 
                 # then to tell the satellite's UHF to get into PIPE mode. Port does not matter in this case. 
                 'port': 0,
